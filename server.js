@@ -52,6 +52,10 @@ function cleanName(n) {
   if (typeof n !== "string") return "";
   return n.replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 20);
 }
+function cleanText(t) {
+  if (typeof t !== "string") return "";
+  return t.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 140);
+}
 function clampInt(v, min, max) {
   const n = Math.floor(Number(v));
   if (!Number.isFinite(n)) fail("Numbers only.");
@@ -63,6 +67,29 @@ function shuffle(a) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+function clearHelp(room) {
+  if (room.helpTimer) clearTimeout(room.helpTimer);
+  room.helpTimer = null;
+}
+function endRound(room, winner, reason, accusedId, accuserId) {
+  clearHelp(room);
+  room.phase = "ended";
+  room.winner = winner;
+  room.endReason = reason;
+  room.accusedId = accusedId || null;
+  room.accuserId = accuserId || null;
+}
+function helpExpired(room) {
+  return room.phase === "playing" && room.help && Date.now() >= room.help.endsAt;
+}
+function timeUp(room) {
+  room.helpTimer = null;
+  if (room.phase === "playing" && room.help) {
+    endRound(room, "killers", "time-up", null, null);
+    broadcast(room);
+  }
 }
 
 // What one player is allowed to see. Roles stay on the server until the round ends.
@@ -85,8 +112,30 @@ function view(room, token) {
     winner: room.winner,
     accusedId: room.accusedId,
     accuserId: room.accuserId,
-    endReason: room.endReason
+    endReason: room.endReason,
+    helpSeconds: room.helpSeconds,
+    serverNow: Date.now(),
+    help: room.help ? helpView(room, mine) : null
   };
+}
+
+// The help call is public, but who made it is not (the police stay secret).
+// Messages are visible only to the police; each other player sees just their own.
+const MAX_MESSAGES_PER_PLAYER = 5;
+const MAX_MESSAGES_TOTAL = 150;
+function helpView(room, mine) {
+  const h = room.help;
+  const own = mine ? h.messages.filter((m) => m.fromId === mine.id) : [];
+  const out = {
+    startedAt: h.startedAt,
+    endsAt: h.endsAt,
+    mine: own.map((m) => m.text),
+    left: Math.max(0, MAX_MESSAGES_PER_PLAYER - own.length)
+  };
+  if (mine && mine.role === "police" && room.phase === "playing") {
+    out.messages = h.messages.map((m) => ({ id: m.id, fromId: m.fromId, text: m.text, at: m.at }));
+  }
+  return out;
 }
 
 function broadcast(room) {
@@ -97,6 +146,8 @@ function broadcast(room) {
 }
 
 function resetToLobby(room, clear) {
+  clearHelp(room);
+  room.help = null;
   if (clear) room.players = [];
   else room.players.forEach((p) => { p.role = null; p.alive = true; p.diedAt = null; });
   room.phase = "lobby";
@@ -138,7 +189,9 @@ function applyAction(room, action, token, body) {
       const police = clampInt(body.police, 1, MAX_PLAYERS);
       if (target < room.players.length) fail("Players wanted cannot be fewer than players already joined.");
       if (killers + police > target - 1) fail("Killers plus police must leave room for at least one citizen.");
-      room.target = target; room.killers = killers; room.police = police;
+      let helpSeconds = room.helpSeconds;
+      if (body.helpSeconds !== undefined) helpSeconds = clampInt(body.helpSeconds, 30, 300);
+      room.target = target; room.killers = killers; room.police = police; room.helpSeconds = helpSeconds;
       break;
     }
     case "start": {
@@ -152,6 +205,8 @@ function applyAction(room, action, token, body) {
         p.role = i < room.killers ? "killer" : (i < room.killers + room.police ? "police" : "citizen");
         p.alive = true; p.diedAt = null;
       });
+      clearHelp(room);
+      room.help = null;
       room.round += 1;
       room.phase = "playing";
       room.winner = null; room.accusedId = null; room.accuserId = null; room.endReason = null;
@@ -164,11 +219,29 @@ function applyAction(room, action, token, body) {
       mine.alive = false; mine.diedAt = Date.now();
       // Only police and killers left alive: the killers win.
       if (!room.players.some((p) => p.role === "citizen" && p.alive)) {
-        room.phase = "ended";
-        room.winner = "killers";
-        room.endReason = "no-citizens";
-        room.accusedId = null; room.accuserId = null;
+        endRound(room, "killers", "no-citizens", null, null);
       }
+      break;
+    }
+    case "help": {
+      if (room.phase !== "playing") fail("No round is running.");
+      if (!mine || mine.role !== "police") fail("Only the police can ask for help.", 403);
+      if (room.help) fail("You already asked for help this round.");
+      const now = Date.now();
+      room.help = { startedAt: now, endsAt: now + room.helpSeconds * 1000, messages: [] };
+      room.helpTimer = setTimeout(() => timeUp(room), room.helpSeconds * 1000 + 100);
+      break;
+    }
+    case "advise": {
+      if (room.phase !== "playing" || !room.help) fail("The police have not asked for help.");
+      if (helpExpired(room)) fail("Time is up.");
+      if (!mine || !mine.alive) fail("Only living players can send advice.", 403);
+      if (mine.role === "police") fail("Police receive advice, they do not send it.", 403);
+      const text = cleanText(body.text);
+      if (!text) fail("Type a message first.");
+      if (room.help.messages.filter((m) => m.fromId === mine.id).length >= MAX_MESSAGES_PER_PLAYER) fail("You have used all " + MAX_MESSAGES_PER_PLAYER + " messages.");
+      if (room.help.messages.length >= MAX_MESSAGES_TOTAL) fail("The police inbox is full.");
+      room.help.messages.push({ id: newId(), fromId: mine.id, text, at: Date.now() });
       break;
     }
     case "accuse": {
@@ -176,9 +249,8 @@ function applyAction(room, action, token, body) {
       if (!mine || mine.role !== "police") fail("Only police can accuse.", 403);
       const target = room.players.find((p) => p.id === body.targetId);
       if (!target || target.id === mine.id) fail("Pick another player.");
-      room.phase = "ended";
-      room.winner = target.role === "killer" ? "town" : "killers";
-      room.accusedId = target.id; room.accuserId = mine.id; room.endReason = "accused";
+      if (helpExpired(room)) fail("Time is up.");
+      endRound(room, target.role === "killer" ? "town" : "killers", "accused", target.id, mine.id);
       break;
     }
     case "lobby": {
@@ -243,7 +315,8 @@ const server = http.createServer(async (req, res) => {
       const room = {
         code: newCode(), hostToken: body.token, phase: "lobby", round: 0,
         target: 6, killers: 1, police: 1, players: [], clients: new Set(),
-        winner: null, accusedId: null, accuserId: null, endReason: null, touched: Date.now()
+        winner: null, accusedId: null, accuserId: null, endReason: null,
+        helpSeconds: 120, help: null, helpTimer: null, touched: Date.now()
       };
       rooms.set(room.code, room);
       return sendJson(res, 200, { code: room.code });
@@ -304,7 +377,7 @@ setInterval(() => {
     if (!times.some((t) => now - t < 3600000)) createLog.delete(ip);
   }
   for (const [code, room] of rooms) {
-    if (room.clients.size === 0 && now - room.touched > ROOM_TTL_MS) rooms.delete(code);
+    if (room.clients.size === 0 && now - room.touched > ROOM_TTL_MS) { clearHelp(room); rooms.delete(code); }
   }
 }, 10 * 60 * 1000).unref();
 

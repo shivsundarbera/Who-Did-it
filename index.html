@@ -75,6 +75,12 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .role-police { --c: var(--police); }
 .role-citizen { --c: var(--citizen); }
 .bigDead { padding: 22px 16px; font-size: 1.25rem; width: 100%; }
+.addRow { display: flex; gap: 8px; }
+.addRow input { flex: 1; }
+.log.inbox li { display: block; overflow-wrap: anywhere; }
+.helpBtn { padding: 16px; font-size: 1.05rem; width: 100%; border-color: var(--police); color: var(--police); background: transparent; }
+.helpPanel { border: 2px solid var(--police); background: var(--panel); padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.timer { font-family: var(--display); font-size: 3.2rem; line-height: 1; color: var(--police); font-variant-numeric: tabular-nums; }
 .picks { display: flex; flex-direction: column; gap: 8px; }
 .picks button { text-align: left; font-size: 1rem; overflow-wrap: anywhere; }
 .banner { background: var(--killer); color: #fff; padding: 16px; display: flex; justify-content: space-between; gap: 12px; align-items: center; font-weight: 600; font-size: 1.1rem; }
@@ -89,22 +95,218 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .reveal div { display: flex; justify-content: space-between; gap: 10px; padding: 8px 10px; background: var(--panel-2); border-left: 4px solid var(--c); }
 .reveal b { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; color: var(--c); }
 #err { color: #ffb4ad; font-size: 0.85rem; min-height: 1em; }
+.art { display: inline-block; flex: none; line-height: 0; }
+.art svg { width: 100%; height: 100%; display: block; }
+.avatar { display: inline-block; flex: none; line-height: 0; }
+.avatar svg { width: 100%; height: 100%; }
+.titleRow { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.trio { display: flex; gap: 2px; }
+.hero { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 0 4px; }
+.heroItem { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; min-width: 0; }
+.heroItem b { font-family: var(--display); font-weight: 400; font-size: 1.05rem; }
+.heroItem span { font-size: 0.75rem; color: var(--dim); }
+.cover { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.qmark { font-family: var(--display); font-size: 3.4rem; line-height: 1; color: var(--citizen); animation: bob 2.4s ease-in-out infinite; }
+.roleCard { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+.roleText { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; min-width: 0; }
+.roleCard.flip { animation: flipIn 0.65s ease both; }
+.picks button { display: flex; align-items: center; gap: 10px; }
+.outCard { display: flex; align-items: center; gap: 14px; }
+.result .art { align-self: center; }
+.banner .art { filter: drop-shadow(0 1px 0 rgba(0,0,0,0.3)); }
+.banner.fresh { animation: slideDown 0.35s ease, shake 0.5s 0.35s; }
+.pop { animation: popIn 0.5s ease both; }
+.timer.low { color: var(--killer); animation: beat 0.8s ease-in-out infinite; }
+.bob { animation: bob 3s ease-in-out infinite; }
+.heroItem:nth-child(2) .art { animation-delay: 0.5s; }
+.heroItem:nth-child(3) .art { animation-delay: 1s; }
+.eyeOpen { transform-box: fill-box; transform-origin: center; animation: blink 4.5s infinite; }
+.spark { transform-box: fill-box; transform-origin: center; animation: twinkle 1.8s ease-in-out infinite; }
+.sweat { animation: drip 2s ease-in infinite; }
+.enter > * { animation: fadeUp 0.4s ease both; }
+.enter > *:nth-child(2) { animation-delay: 0.06s; }
+.enter > *:nth-child(3) { animation-delay: 0.12s; }
+.enter > *:nth-child(4) { animation-delay: 0.18s; }
+.enter > *:nth-child(5) { animation-delay: 0.24s; }
+button { transition: transform 0.08s ease, border-color 0.15s ease, background 0.15s ease; }
+button:active:not(:disabled) { transform: scale(0.97); }
+.confettiLayer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+.confettiLayer i { position: absolute; top: -20px; width: 9px; height: 14px; animation: confettiFall linear forwards; }
+.flashRed { position: fixed; inset: 0; pointer-events: none; z-index: 50; background: radial-gradient(circle, transparent 30%, rgba(229, 72, 63, 0.55)); animation: flashFade 1.3s ease-out forwards; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes flipIn { from { opacity: 0; transform: perspective(800px) rotateY(-90deg) scale(0.9); } to { opacity: 1; transform: perspective(800px) rotateY(0) scale(1); } }
+@keyframes popIn { 0% { opacity: 0; transform: scale(0.85); } 60% { opacity: 1; transform: scale(1.04); } 100% { transform: scale(1); } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-7px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 94% { transform: scaleY(0.1); } }
+@keyframes twinkle { 0%, 100% { transform: scale(0.7) rotate(0); opacity: 0.6; } 50% { transform: scale(1.15) rotate(20deg); opacity: 1; } }
+@keyframes drip { 0% { transform: translateY(-3px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(9px); opacity: 0; } }
+@keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); } }
+@keyframes flashFade { from { opacity: 1; } to { opacity: 0; } }
+@media (max-width: 380px) { .roleCard { grid-template-columns: 1fr; } .roleCard .art { justify-self: center; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+.modal { position: fixed; inset: 0; z-index: 70; background: rgba(8, 10, 14, 0.82); overflow-y: auto; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 32px max(16px, env(safe-area-inset-left, 0px)); display: flex; justify-content: center; align-items: flex-start; }
+.modalCard { width: 100%; max-width: 480px; background: var(--bg); border: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 14px; animation: popIn 0.35s ease both; }
+.howRole { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; background: var(--panel); border-left: 4px solid var(--c); padding: 10px 12px; }
+.howRole b { font-family: var(--display); font-weight: 400; font-size: 1.1rem; color: var(--c); text-transform: uppercase; letter-spacing: 0.05em; }
+.howRole p { font-size: 0.9rem; }
+.howList { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+.howList li { padding-left: 2px; }
+.howHead { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.statusRow { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.killScene { position: fixed; inset: 0; z-index: 60; pointer-events: none; background: rgba(10, 12, 16, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; animation: ksFade 3.2s ease both; }
+.ksStage { position: relative; width: min(92vw, 360px); height: 170px; }
+.ksGround { position: absolute; left: 4%; right: 4%; bottom: 14px; height: 10px; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55), transparent 70%); }
+.ksVictim { position: absolute; left: 10%; bottom: 26px; animation: ksVictim 3.2s ease-in-out both; }
+.ksKiller { position: absolute; right: 10%; bottom: 26px; animation: ksKiller 3.2s ease-in-out both; }
+.ksVictim .art, .ksKiller .art { animation: hop 0.28s ease-in-out 3; }
+.ksKnife { position: absolute; left: -46px; top: 40px; width: 62px; height: 24px; opacity: 0; animation: ksKnife 3.2s ease-in-out both; }
+.ksKnife svg { width: 100%; height: 100%; }
+.ksBurst { position: absolute; left: 50%; bottom: 58px; width: 74px; height: 74px; margin-left: -37px; opacity: 0; animation: ksBurst 3.2s ease-out both; }
+.ksBurst svg { width: 100%; height: 100%; }
+.ksGhost { position: absolute; left: 10%; bottom: 52px; opacity: 0; animation: ksGhost 3.2s ease-out both; }
+.ksCaption { margin-top: 14px; font-family: var(--display); font-size: 1.35rem; text-align: center; max-width: 90vw; overflow-wrap: anywhere; opacity: 0; animation: ksCap 3.2s ease both; }
+@keyframes ksFade { 0% { opacity: 0; } 6% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes ksVictim {
+  0% { transform: translateX(-170px); }
+  28% { transform: translateX(0) rotate(0deg); filter: none; }
+  39% { transform: translateX(0) rotate(0deg); filter: none; }
+  42% { transform: translateX(-16px) rotate(-10deg); }
+  47% { transform: translateX(0) rotate(0deg); }
+  56% { transform: translateX(-4px) translateY(20px) rotate(-90deg); filter: grayscale(1) brightness(0.7); opacity: 1; }
+  72% { transform: translateX(-4px) translateY(20px) rotate(-90deg); filter: grayscale(1) brightness(0.7); opacity: 1; }
+  81%, 100% { transform: translateX(-4px) translateY(20px) rotate(-90deg); filter: grayscale(1) brightness(0.7); opacity: 0; }
+}
+@keyframes ksKiller {
+  0% { transform: translateX(170px); }
+  28%, 34% { transform: translateX(0); }
+  38%, 47% { transform: translateX(-54px); }
+  55%, 100% { transform: translateX(0); }
+}
+@keyframes ksKnife {
+  0%, 30% { opacity: 0; transform: rotate(-35deg) translateX(10px); }
+  34% { opacity: 1; transform: rotate(-12deg); }
+  38%, 47% { opacity: 1; transform: rotate(0deg) translateX(-6px); }
+  70% { opacity: 1; transform: rotate(0deg); }
+  80%, 100% { opacity: 0; }
+}
+@keyframes ksBurst {
+  0%, 37% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  41% { opacity: 1; transform: scale(1.25) rotate(12deg); }
+  50%, 100% { opacity: 0; transform: scale(1.7) rotate(24deg); }
+}
+@keyframes ksGhost {
+  0%, 55% { opacity: 0; transform: translateY(0); }
+  62% { opacity: 1; transform: translateY(-8px); }
+  86%, 100% { opacity: 0; transform: translateY(-90px); }
+}
+@keyframes ksCap { 0%, 44% { opacity: 0; transform: translateY(8px); } 52%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+.killScene.verdict { animation-duration: 3.8s; }
+.vsPolice { position: absolute; left: 36%; bottom: 26px; }
+.vsKiller { position: absolute; right: 10%; bottom: 26px; }
+.vsCitizen { position: absolute; left: 38%; bottom: 26px; }
+.vsCuffs { position: absolute; right: 12%; bottom: 26px; width: 94px; height: 48px; opacity: 0; animation: vsCuffs 3.8s ease-in both; }
+.vsCuffs svg, .vsX svg { width: 100%; height: 100%; }
+.vsStars { position: absolute; right: 12%; top: 6px; width: 94px; height: 40px; opacity: 0; animation: vsStars 3.8s ease both; }
+.vsStars i { position: absolute; top: 8px; width: 16px; height: 16px; background: var(--citizen); clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 60%, 80% 100%, 50% 76%, 20% 100%, 30% 60%, 0 38%, 38% 36%); animation: vsOrbit 0.9s linear infinite; }
+.vsStars i:nth-child(1) { left: 6px; }
+.vsStars i:nth-child(2) { left: 38px; animation-delay: -0.3s; }
+.vsStars i:nth-child(3) { left: 70px; animation-delay: -0.6s; }
+.vsX { position: absolute; left: 36%; bottom: 20px; width: 100px; height: 100px; opacity: 0; animation: vsX 3.8s ease-out both; }
+.vsPeek { position: absolute; right: 2%; bottom: 8px; animation: vsPeek 3.8s ease-out both; }
+.vsHa { position: absolute; right: 24%; bottom: 96px; background: #fff; color: #12151a; border: 3px solid #0a0b10; border-radius: 14px; padding: 4px 10px; font-weight: 700; opacity: 0; animation: vsHa 3.8s ease-out both; }
+.vsWho { position: absolute; left: 44%; bottom: 112px; background: #fff; color: #12151a; border: 3px solid #0a0b10; border-radius: 14px; padding: 2px 10px; font-weight: 700; opacity: 0; animation: vsWho 3.8s ease-out both; }
+.vsPolice .art, .vsKiller .art, .vsCitizen .art { animation: none; }
+.vsPolice.run { animation: vsRun 3.8s ease-in-out both; }
+.vsPolice.run .art { animation: hop 0.22s ease-in-out 4; }
+.vsPolice.point { animation: vsPointIn 3.8s ease-out both; left: 8%; }
+.vsKiller.smug { animation: vsSmug 3.8s ease-out both; }
+.vsCitizen.shock { animation: vsShock 3.8s ease-out both; }
+.vsArrow { position: absolute; left: 24%; bottom: 62px; width: 90px; height: 24px; opacity: 0; animation: vsArrow 3.8s ease-out both; }
+.vsArrow svg { width: 100%; height: 100%; }
+.taunt { position: fixed; left: 0; right: 0; bottom: max(12px, env(safe-area-inset-bottom, 0px)); display: flex; align-items: flex-end; justify-content: center; gap: 8px; padding: 0 16px; z-index: 55; pointer-events: none; animation: tauntIn 4.8s ease both; }
+.bubble { position: relative; background: #fff; color: #12151a; border: 3px solid #0a0b10; border-radius: 16px; padding: 10px 14px; font-weight: 600; max-width: 260px; margin-bottom: 26px; overflow-wrap: anywhere; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45); }
+.bubble::before { content: ""; position: absolute; left: -15px; bottom: 14px; border: 8px solid transparent; border-right: 9px solid #0a0b10; }
+.bubble::after { content: ""; position: absolute; left: -9px; bottom: 16px; border: 6px solid transparent; border-right: 7px solid #fff; }
+.wiggle { animation: wiggle 0.45s ease-in-out infinite; }
+@keyframes tauntIn { 0% { transform: translateY(130%); } 8% { transform: translateY(0); } 90% { transform: translateY(0); } 100% { transform: translateY(130%); } }
+@keyframes wiggle { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+@keyframes vsRun {
+  0% { transform: translateX(-210px); }
+  26%, 100% { transform: translateX(0); }
+}
+@keyframes vsSmug {
+  0% { transform: scale(0.1); opacity: 0; }
+  10%, 27% { transform: scale(1); opacity: 1; }
+  30% { transform: translateX(8px) rotate(6deg); }
+  33% { transform: translateX(-8px) rotate(-6deg); }
+  36% { transform: translateX(6px) rotate(5deg); }
+  39% { transform: translateX(0) rotate(0); }
+  54% { transform: translateY(0); }
+  58% { transform: translateX(-5px); }
+  62% { transform: translateX(5px); }
+  66% { transform: translateX(-5px); }
+  70%, 100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes vsCuffs {
+  0%, 38% { opacity: 0; transform: translateY(-190px) rotate(-12deg); }
+  46% { opacity: 1; transform: translateY(0) rotate(0); }
+  49% { transform: translateY(-14px); }
+  52%, 88% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; }
+}
+@keyframes vsStars { 0%, 52% { opacity: 0; } 58%, 88% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes vsOrbit { 0% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-8px) rotate(90deg); } 50% { transform: translateY(0) rotate(180deg); } 75% { transform: translateY(8px) rotate(270deg); } 100% { transform: translateY(0) rotate(360deg); } }
+@keyframes vsShock {
+  0% { transform: scale(0.1); opacity: 0; }
+  10%, 30% { transform: scale(1); opacity: 1; }
+  34% { transform: translateX(-5px) rotate(-5deg); }
+  38% { transform: translateX(5px) rotate(5deg); }
+  42%, 100% { transform: translateX(0) rotate(0); opacity: 1; }
+}
+@keyframes vsPointIn { 0% { transform: translateX(-120px); } 14%, 100% { transform: translateX(0); } }
+@keyframes vsArrow {
+  0%, 24% { opacity: 0; transform: translateX(-30px); }
+  30% { opacity: 1; transform: translateX(0); }
+  40% { opacity: 1; transform: translateX(26px); }
+  46%, 100% { opacity: 0; transform: translateX(34px); }
+}
+@keyframes vsX {
+  0%, 36% { opacity: 0; transform: scale(2.4) rotate(-20deg); }
+  42% { opacity: 1; transform: scale(1) rotate(0deg); }
+  46% { transform: scale(1.12); }
+  50%, 88% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; }
+}
+@keyframes vsPeek { 0%, 46% { transform: translateY(130px); } 56%, 100% { transform: translateY(0); } }
+@keyframes vsHa { 0%, 58% { opacity: 0; transform: scale(0.5); } 64%, 88% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+@keyframes vsWho { 0%, 12% { opacity: 0; transform: scale(0.5); } 18%, 40% { opacity: 1; transform: scale(1); } 46%, 100% { opacity: 0; } }
 [hidden] { display: none !important; }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <h1>Who Did It</h1>
-    <p class="dim small">Killer, police and citizens. Everyone plays on their own phone.</p>
-    <div id="status"></div>
+    <div class="titleRow">
+      <div>
+        <h1>Who Did It</h1>
+        <p class="dim small">Killer, police and citizens. Everyone plays on their own phone.</p>
+      </div>
+      <div class="trio" id="trio" aria-hidden="true"></div>
+    </div>
+    <div class="statusRow"><div id="status"></div><button class="link" id="howLink" type="button" hidden>How to play</button></div>
   </header>
 
   <div id="home" class="stack" hidden>
+    <div class="hero" id="hero"></div>
     <div class="card">
       <h2>Host a game</h2>
       <p class="dim">Create a lobby, then send the link to your friends.</p>
       <button class="primary" type="button" id="createBtn">Create lobby</button>
+      <button type="button" id="howBtn">How to play</button>
     </div>
     <form class="card" id="codeForm">
       <h3>Have a code?</h3>
@@ -126,11 +328,28 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
       <input type="text" id="nameInput" maxlength="20" placeholder="Your name" autocomplete="off" aria-label="Your name">
       <button class="primary" type="submit" id="joinBtn">Join game</button>
     </form>
-    <div id="view" class="stack"></div>
+    <div id="viewTop" class="stack"></div>
+    <form id="adviceForm" class="card" hidden>
+      <h3>Message the police</h3>
+      <p class="dim small" id="adviceHint"></p>
+      <ul class="log inbox" id="adviceSent"></ul>
+      <div class="addRow">
+        <input type="text" id="adviceInput" maxlength="140" placeholder="Type your advice for the police" autocomplete="off" aria-label="Message to the police">
+        <button class="primary" type="submit" id="adviceBtn">Send</button>
+      </div>
+    </form>
+    <div id="viewBottom" class="stack"></div>
   </div>
 
   <div id="err" role="status"></div>
 </main>
+
+<div id="howto" class="modal" role="dialog" aria-modal="true" aria-labelledby="howTitle" hidden>
+  <div class="modalCard">
+    <div class="howHead"><h2 id="howTitle">How to play</h2><button type="button" id="howClose">Close</button></div>
+    <div id="howBody" class="stack"></div>
+  </div>
+</div>
 
 <script>
 (function () {
@@ -152,6 +371,214 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     return n;
   }
 
+  var ART = {
+    killer: '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path d="M60 6C26 6 10 38 10 70c0 28 22 44 50 44s50-16 50-44C110 38 94 6 60 6z" fill="#1c1e28" stroke="#0a0b10" stroke-width="3"/><ellipse cx="60" cy="68" rx="35" ry="37" fill="#f1cfa8" stroke="#0a0b10" stroke-width="3"/><path d="M24 56C30 28 90 28 96 56C80 44 40 44 24 56z" fill="#1c1e28"/><g class="eyeOpen"><ellipse cx="44" cy="68" rx="8" ry="9" fill="#fff" stroke="#0a0b10" stroke-width="2.5"/><circle cx="46" cy="69" r="4" fill="#0a0b10"/></g><path d="M34 54Q44 46 55 53" stroke="#0a0b10" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M68 69Q77 60 86 69" stroke="#0a0b10" stroke-width="4.5" fill="none" stroke-linecap="round"/><path d="M42 90Q62 106 84 84" stroke="#0a0b10" stroke-width="4.5" fill="none" stroke-linecap="round"/><circle cx="88" cy="80" r="5" fill="#e5483f" opacity=".35"/><path class="spark" d="M100 50l2.4 6 6 2.4-6 2.4-2.4 6-2.4-6-6-2.4 6-2.4z" fill="#e9b44c"/></svg>',
+    police: '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><circle cx="60" cy="70" r="38" fill="#f1cfa8" stroke="#0a0b10" stroke-width="3"/><path d="M22 58C22 14 98 14 98 58z" fill="#3f6fd1" stroke="#0a0b10" stroke-width="3"/><rect x="14" y="54" width="92" height="13" rx="6.5" fill="#2b4f9e" stroke="#0a0b10" stroke-width="3"/><polygon points="60,23 62.94,29.95 70.46,30.6 64.76,35.55 66.47,42.9 60,39 53.53,42.9 55.24,35.55 49.54,30.6 57.06,29.95" fill="#e9b44c" stroke="#0a0b10" stroke-width="2" stroke-linejoin="round"/><ellipse cx="46" cy="80" rx="7" ry="8" fill="#fff" stroke="#0a0b10" stroke-width="2.5"/><circle cx="48" cy="81" r="3.5" fill="#0a0b10"/><ellipse cx="74" cy="80" rx="7" ry="8" fill="#fff" stroke="#0a0b10" stroke-width="2.5"/><circle cx="72" cy="81" r="3.5" fill="#0a0b10"/><path d="M36 70L54 75M84 70L66 75" stroke="#0a0b10" stroke-width="4" stroke-linecap="round"/><path d="M42 96Q52 88 60 95Q68 88 78 96Q68 104 60 98Q52 104 42 96z" fill="#3a2a1e" stroke="#0a0b10" stroke-width="2"/></svg>',
+    citizen: '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><circle cx="60" cy="68" r="38" fill="#f6d7b0" stroke="#0a0b10" stroke-width="3"/><path d="M24 60C20 20 100 14 96 60C86 40 36 38 24 60z" fill="#5a3b24" stroke="#0a0b10" stroke-width="3"/><path d="M52 24Q60 4 70 24z" fill="#5a3b24" stroke="#0a0b10" stroke-width="3" stroke-linejoin="round"/><ellipse cx="44" cy="72" rx="9" ry="10" fill="#fff" stroke="#0a0b10" stroke-width="2.5"/><circle cx="45" cy="69" r="4" fill="#0a0b10"/><ellipse cx="76" cy="72" rx="9" ry="10" fill="#fff" stroke="#0a0b10" stroke-width="2.5"/><circle cx="75" cy="69" r="4" fill="#0a0b10"/><path d="M33 62L52 54M87 62L68 54" stroke="#0a0b10" stroke-width="4" stroke-linecap="round"/><ellipse cx="60" cy="96" rx="6" ry="5" fill="#0a0b10"/><path class="sweat" d="M98 50q7 11 0 15q-7-4 0-15z" fill="#7cc6f2" stroke="#0a0b10" stroke-width="1.5"/></svg>',
+    ghost: '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path d="M24 108V58C24 28 42 12 60 12s36 16 36 46v50l-12-10-12 10-12-10-12 10-12-10z" fill="#e8edf5" stroke="#0a0b10" stroke-width="3" stroke-linejoin="round"/><path d="M42 50l12 12M54 50L42 62M66 50l12 12M78 50L66 62" stroke="#0a0b10" stroke-width="4" stroke-linecap="round"/><ellipse cx="60" cy="84" rx="7" ry="9" fill="#0a0b10"/></svg>'
+  };
+  function art(name, size, cls) {
+    var s = el("span", { class: "art" + (cls ? " " + cls : ""), "aria-hidden": "true" });
+    s.style.width = size + "px";
+    s.style.height = size + "px";
+    s.innerHTML = ART[name];
+    return s;
+  }
+  var AV_COLORS = ["#e5483f", "#5b8def", "#e9b44c", "#6cc08b", "#b57edc", "#f08a4b", "#4fc3c9", "#d96fa0"];
+  function avatar(name, dead, size) {
+    var h = 0;
+    for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+    var col = AV_COLORS[h % AV_COLORS.length];
+    var eyes = dead
+      ? '<path d="M8 10l4 4M12 10l-4 4M20 10l4 4M24 10l-4 4" stroke="#12151a" stroke-width="2" stroke-linecap="round"/>'
+      : '<circle cx="11" cy="12" r="2.2" fill="#12151a"/><circle cx="21" cy="12" r="2.2" fill="#12151a"/>';
+    var mouth = dead
+      ? '<path d="M11 22h10" stroke="#12151a" stroke-width="2" stroke-linecap="round"/>'
+      : '<path d="M10 19q6 6 12 0" stroke="#12151a" stroke-width="2" fill="none" stroke-linecap="round"/>';
+    var s = el("span", { class: "avatar", "aria-hidden": "true" });
+    s.style.width = (size || 24) + "px";
+    s.style.height = (size || 24) + "px";
+    s.innerHTML = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="' + col + '"' + (dead ? ' opacity=".45"' : "") + "/>" + eyes + mouth + "</svg>";
+    return s;
+  }
+  var reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  function celebrate(town) {
+    if (reduceMotion) return;
+    var layer = el("div", { class: town ? "confettiLayer" : "flashRed", "aria-hidden": "true" });
+    if (town) {
+      var colors = ["#e9b44c", "#5b8def", "#6cc08b", "#e5483f", "#ece6d6"];
+      for (var i = 0; i < 44; i++) {
+        var p = document.createElement("i");
+        p.style.left = Math.random() * 100 + "%";
+        p.style.background = colors[i % colors.length];
+        p.style.animationDelay = Math.random() * 0.8 + "s";
+        p.style.animationDuration = 2.4 + Math.random() * 1.8 + "s";
+        layer.append(p);
+      }
+    }
+    document.body.append(layer);
+    setTimeout(function () { layer.remove(); }, 5200);
+  }
+
+  var KNIFE = '<svg viewBox="0 0 80 30" xmlns="http://www.w3.org/2000/svg"><path d="M3 15L48 5Q55 5 55 10L55 20Q55 25 48 25Z" fill="#dfe6ee" stroke="#0a0b10" stroke-width="2.5" stroke-linejoin="round"/><path d="M12 15L46 9" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/><rect x="55" y="9" width="22" height="12" rx="5" fill="#6b4a2f" stroke="#0a0b10" stroke-width="2.5"/><rect x="53" y="6" width="4" height="18" rx="1.5" fill="#9aa4b2" stroke="#0a0b10" stroke-width="2"/></svg>';
+  var BURST = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,2 60,32 92,22 70,46 98,66 64,66 62,98 46,72 18,92 28,58 2,40 34,34" fill="#e9b44c" stroke="#e5483f" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="50" r="12" fill="#fff"/></svg>';
+
+  // A short cartoon scene shown to everyone except the player who just went out.
+  function killScene(name) {
+    if (reduceMotion) return;
+    var old = document.getElementById("killScene");
+    if (old) old.remove();
+    var knife = el("div", { class: "ksKnife" });
+    knife.innerHTML = KNIFE;
+    var burst = el("div", { class: "ksBurst" });
+    burst.innerHTML = BURST;
+    var scene = el("div", { class: "killScene", id: "killScene", "aria-hidden": "true" }, [
+      el("div", { class: "ksStage" }, [
+        el("div", { class: "ksGround" }),
+        el("div", { class: "ksVictim" }, [art("citizen", 86)]),
+        el("div", { class: "ksKiller" }, [art("killer", 86), knife]),
+        burst,
+        el("div", { class: "ksGhost" }, [art("ghost", 60)])
+      ]),
+      el("div", { class: "ksCaption", text: name + " was eliminated" })
+    ]);
+    document.body.append(scene);
+    setTimeout(function () { scene.remove(); }, 3400);
+  }
+
+  function buildHowTo() {
+    var body = $("howBody");
+    function role(name, color, text) {
+      var r = el("div", { class: "howRole role-" + name }, [art(name, 56), el("div", null, [el("b", { text: name }), el("p", { text: text })])]);
+      return r;
+    }
+    function list(items) { return el("ol", { class: "howList" }, items.map(function (t) { return el("li", { text: t }); })); }
+    body.append(
+      el("p", { class: "dim", text: "A Mafia-style party game for 3 or more friends. Everyone plays on their own phone, in the same room." }),
+      el("h3", { text: "The three roles" }),
+      role("killer", "", "Secretly eliminates citizens by winking one eye at them without anyone noticing. Has no buttons."),
+      role("police", "", "Has to find the killer. Gets one guess, and can ask everyone for help once per round."),
+      role("citizen", "", "Tries to survive. If a killer winks at you, wait a moment, then tap \"I am dead\"."),
+      el("h3", { text: "How a round goes" }),
+      list([
+        "The host creates a lobby and sends the link. Friends open it and join with a name.",
+        "The host picks how many killers and police, then taps Start. Roles are secret and random.",
+        "Everyone taps to reveal their own role, then hides it again.",
+        "The killer winks at citizens. A citizen who is winked at taps \"I am dead\", and everyone sees who went out.",
+        "The police can tap Help. A timer starts and every living player can type advice that only the police read.",
+        "The police tap a name to accuse the killer. They only get one guess."
+      ]),
+      el("h3", { text: "Who wins" }),
+      list([
+        "Police and citizens win if the police name the killer.",
+        "The killers win if the police guess wrong.",
+        "The killers also win if the help timer runs out, or if only police and killers are left alive."
+      ]),
+      el("h3", { text: "Good to know" }),
+      list([
+        "Keep your phone screen hidden when your role is showing.",
+        "Players who are out stay quiet and cannot send advice.",
+        "Killers can send advice to the police too, so not every message is true."
+      ])
+    );
+  }
+
+  var howOpener = null;
+  function openHow(opener) {
+    howOpener = opener || null;
+    $("howto").hidden = false;
+    $("howClose").focus();
+  }
+  function closeHow() {
+    $("howto").hidden = true;
+    if (howOpener && howOpener.focus) howOpener.focus();
+  }
+
+  // The killer pops up on the police screen every 30 to 40 seconds to tease them.
+  // Edit this list to change what the killer says.
+  var TAUNTS = [
+    "Ki re police, ekhono khunje pelo na?",
+    "Ami tomar thik samnei achi, tao dhorte parli na!",
+    "Tick tock! Shomoy kintu sesh hoye jacche!",
+    "Eto bhabcho kano? Ami toh ekdom kachhei!",
+    "Abhi tak nahi pakda? Kya police hai tu!",
+    "Haha! Tumse na ho payega, chhod de!",
+    "Aro ektu chesta koro... hoyto pere jabe. Hoyto na!",
+    "Still nothing? Cute."
+  ];
+  var tauntTimer = null, lastTaunt = -1, tauntsOff = false;
+  try { tauntsOff = localStorage.getItem("who-did-it-taunts") === "off"; } catch (e) {}
+
+  function shouldTaunt() {
+    return !!(st && st.phase === "playing" && st.me && st.me.role === "police" && st.me.alive && revealed && !tauntsOff);
+  }
+  function showTaunt() {
+    var i;
+    do { i = Math.floor(Math.random() * TAUNTS.length); } while (i === lastTaunt && TAUNTS.length > 1);
+    lastTaunt = i;
+    var old = document.getElementById("taunt");
+    if (old) old.remove();
+    var box = el("div", { class: "taunt", id: "taunt", "aria-hidden": "true" }, [art("killer", 84, "wiggle"), el("div", { class: "bubble", text: TAUNTS[i] })]);
+    document.body.append(box);
+    try { if (navigator.vibrate) navigator.vibrate(120); } catch (e) {}
+    setTimeout(function () { box.remove(); }, 4900);
+  }
+  function scheduleTaunt() {
+    tauntTimer = setTimeout(function () {
+      tauntTimer = null;
+      if (shouldTaunt()) { showTaunt(); scheduleTaunt(); }
+    }, 30000 + Math.random() * 10000);
+  }
+  function syncTaunts() {
+    if (shouldTaunt()) { if (!tauntTimer) scheduleTaunt(); }
+    else if (tauntTimer) { clearTimeout(tauntTimer); tauntTimer = null; }
+  }
+
+  var CUFFS = '<svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="28" r="17" fill="none" stroke="#0a0b10" stroke-width="12"/><circle cx="24" cy="28" r="17" fill="none" stroke="#c9d3df" stroke-width="7"/><circle cx="76" cy="28" r="17" fill="none" stroke="#0a0b10" stroke-width="12"/><circle cx="76" cy="28" r="17" fill="none" stroke="#c9d3df" stroke-width="7"/><rect x="38" y="22" width="24" height="12" rx="6" fill="#c9d3df" stroke="#0a0b10" stroke-width="3"/></svg>';
+  var BIGX = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M16 16L84 84M84 16L16 84" stroke="#0a0b10" stroke-width="22" stroke-linecap="round"/><path d="M16 16L84 84M84 16L16 84" stroke="#e5483f" stroke-width="14" stroke-linecap="round"/></svg>';
+  var ARROW = '<svg viewBox="0 0 90 24" xmlns="http://www.w3.org/2000/svg"><path d="M2 12H70M56 3L74 12L56 21" stroke="#0a0b10" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12H70M56 3L74 12L56 21" stroke="#e5483f" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function svgBox(cls, svg) { var d = el("div", { class: cls }); d.innerHTML = svg; return d; }
+
+  // Shown to everyone when the police make their guess.
+  function verdictScene(kind, name) {
+    if (reduceMotion) return;
+    var old = document.getElementById("killScene");
+    if (old) old.remove();
+    var kids;
+    if (kind === "right") {
+      kids = [
+        el("div", { class: "ksGround" }),
+        el("div", { class: "vsPolice run" }, [art("police", 86)]),
+        el("div", { class: "vsKiller smug" }, [art("killer", 86)]),
+        svgBox("vsCuffs", CUFFS),
+        el("div", { class: "vsStars" }, [el("i"), el("i"), el("i")]),
+        svgBox("ksBurst", BURST)
+      ];
+    } else {
+      var who = el("div", { class: "vsWho", text: "Who, me?" });
+      var ha = el("div", { class: "vsHa", text: "Ha ha, wrong!" });
+      kids = [
+        el("div", { class: "ksGround" }),
+        el("div", { class: "vsPolice point" }, [art("police", 86)]),
+        svgBox("vsArrow", ARROW),
+        el("div", { class: "vsCitizen shock" }, [art("citizen", 86)]),
+        who,
+        svgBox("vsX", BIGX),
+        el("div", { class: "vsPeek" }, [art("killer", 74, "wiggle")]),
+        ha
+      ];
+    }
+    var caption = kind === "right" ? "Caught! " + name + " was the killer" : "Wrong! " + name + " was innocent";
+    var scene = el("div", { class: "killScene verdict", id: "killScene", "aria-hidden": "true" }, [
+      el("div", { class: "ksStage" }, kids),
+      el("div", { class: "ksCaption", text: caption })
+    ]);
+    if (kind === "right") scene.querySelector(".ksBurst").style.cssText = "left:58%;bottom:70px;animation:ksBurst 3.8s ease-out both;animation-delay:0s";
+    document.body.append(scene);
+    setTimeout(function () { scene.remove(); }, 4000);
+  }
+
   function makeToken() {
     var a = new Uint8Array(16);
     (window.crypto || window.msCrypto).getRandomValues(a);
@@ -170,12 +597,12 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   var token = getToken();
   var match = location.pathname.match(/^\/r\/([A-Za-z0-9]{3,10})\/?$/);
   var code = match ? match[1].toUpperCase() : null;
-  var st = null, revealed = false, confirmStep = null, banners = [], knownDead = null, busy = false;
+  var st = null, revealed = false, confirmStep = null, banners = [], knownDead = null, busy = false, clockOffset = 0, fx = { screen: false, role: false, banner: false, help: false, result: false, kill: null, verdict: null };
 
   var ROLE_TEXT = {
-    killer: "Take out citizens without being spotted. You have no buttons. Stay quiet.",
-    police: "Find the killer. You get exactly one guess, so choose carefully.",
-    citizen: "Stay alive. If a killer gets you, tap the button to tell everyone."
+    killer: "Take out citizens without being spotted. You have no buttons. If the police ask for help, you can message them too.",
+    police: "Find the killer. You get exactly one guess, so choose carefully. You can ask everyone for help, but then a timer starts and the killers win if it runs out.",
+    citizen: "Stay alive. If a killer gets you, tap the button to tell everyone. If the police ask for help, send them advice."
   };
 
   function setErr(t) { $("err").textContent = t || ""; }
@@ -191,18 +618,36 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   }
 
   async function act(action, extra) {
-    if (busy) return;
+    if (busy) return false;
     busy = true; setErr("");
+    var ok = false;
     try {
       var body = Object.assign({ token: token }, extra || {});
       var data = await api("POST", "/api/room/" + code + "/" + action, body);
+      ok = true;
       if (data.state) onState(data.state);
     } catch (e) { setErr(e.message); }
     busy = false;
+    return ok;
   }
 
   function onState(s) {
+    if (s.serverNow) clockOffset = s.serverNow - Date.now();
     var prev = st;
+    if (!prev || prev.phase !== s.phase) { fx.screen = true; if (s.phase === "ended") fx.result = true; }
+    if (s.help && (!prev || !prev.help)) fx.help = true;
+    if (prev && prev.phase === "playing" && prev.round === s.round && (s.phase === "playing" || s.phase === "ended")) {
+      var gone = null;
+      s.players.forEach(function (p) {
+        var was = prev.players.filter(function (x) { return x.id === p.id; })[0];
+        if (was && was.alive && !p.alive && !gone) gone = p;
+      });
+      if (gone && !gone.isMe) fx.kill = gone.name;
+    }
+    if (prev && prev.phase === "playing" && s.phase === "ended" && s.endReason === "accused") {
+      var accused = s.players.filter(function (x) { return x.id === s.accusedId; })[0];
+      fx.verdict = { kind: s.winner === "town" ? "right" : "wrong", name: accused ? accused.name : "Someone" };
+    }
     if (!prev || prev.phase !== s.phase || prev.round !== s.round) {
       if (s.phase === "playing") { revealed = false; confirmStep = null; banners = []; knownDead = null; }
       if (s.phase !== "playing") { banners = []; confirmStep = null; }
@@ -210,7 +655,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     if (s.phase === "playing") {
       var dead = s.players.filter(function (p) { return !p.alive; });
       if (knownDead) {
-        dead.forEach(function (p) { if (!knownDead[p.id]) banners.push(p.name + " died"); });
+        dead.forEach(function (p) { if (!knownDead[p.id]) { banners.push(p.name + " died"); fx.banner = true; } });
       }
       knownDead = {};
       dead.forEach(function (p) { knownDead[p.id] = true; });
@@ -219,15 +664,22 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     render();
   }
 
-  function stepper(label, value, min, max, onChange) {
+  function stepper(label, value, min, max, onChange, step, fmt) {
+    step = step || 1;
     return el("div", { class: "row" }, [
       el("span", { text: label }),
       el("div", { class: "stepper" }, [
-        el("button", { type: "button", "aria-label": "Fewer " + label, disabled: value <= min, text: "-", onclick: function () { onChange(value - 1); } }),
-        el("b", { text: String(value) }),
-        el("button", { type: "button", "aria-label": "More " + label, disabled: value >= max, text: "+", onclick: function () { onChange(value + 1); } })
+        el("button", { type: "button", "aria-label": "Fewer " + label, disabled: value <= min, text: "-", onclick: function () { onChange(value - step); } }),
+        el("b", { text: fmt ? fmt(value) : String(value) }),
+        el("button", { type: "button", "aria-label": "More " + label, disabled: value >= max, text: "+", onclick: function () { onChange(value + step); } })
       ])
     ]);
+  }
+
+  function fmtTime(ms) {
+    var t = Math.max(0, Math.ceil(ms / 1000));
+    var m = Math.floor(t / 60), s = t % 60;
+    return m + ":" + (s < 10 ? "0" : "") + s;
   }
 
   function confirmCard(text, yesLabel, yesFn, yesClass) {
@@ -275,7 +727,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     var n = st.players.length, k = st.killers, p = st.police;
     var citizens = Math.max(0, n - k - p);
     var chips = el("div", { class: "chips" }, st.players.map(function (pl) {
-      var kids = [pl.name];
+      var kids = [avatar(pl.name, false, 24), pl.name];
       if (st.isHost && !pl.isMe) {
         kids.push(el("button", { type: "button", "aria-label": "Remove " + pl.name, text: "x", onclick: function () { act("kick", { playerId: pl.id }); } }));
       }
@@ -292,12 +744,13 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
       var reason = "";
       if (n < 3) reason = "Need at least 3 players to start.";
       else if (k + p >= n) reason = "Too many killers and police for " + n + " players.";
-      function cfg(patch) { act("config", Object.assign({ target: st.target, killers: k, police: p }, patch)); }
+      function cfg(patch) { act("config", Object.assign({ target: st.target, killers: k, police: p, helpSeconds: st.helpSeconds }, patch)); }
       box.append(el("div", { class: "card" }, [
         el("h3", { text: "Host settings" }),
         stepper("Players wanted", st.target, Math.max(3, n, k + p + 1), 20, function (v) { cfg({ target: v }); }),
         stepper("Killers", k, 1, Math.max(1, st.target - p - 1), function (v) { cfg({ killers: v }); }),
         stepper("Police", p, 1, Math.max(1, st.target - k - 1), function (v) { cfg({ police: v }); }),
+        stepper("Police time after a help call", st.helpSeconds, 30, 300, function (v) { cfg({ helpSeconds: v }); }, 30, function (v) { return fmtTime(v * 1000); }),
         el("p", { class: "dim small", text: "Everyone else is a citizen: " + citizens + " with the current lobby." }),
         reason ? el("p", { class: "small", text: reason }) : null,
         el("button", { class: "primary", type: "button", disabled: !!reason, text: "Start game", onclick: function () { act("start"); } })
@@ -310,48 +763,110 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     }
   }
 
-  function renderGame(box) {
+  function helpPanel() {
+    return el("div", { class: "helpPanel" + (fx.help ? " pop" : ""), role: "alert" }, [
+      el("h3", { text: "The police asked for help" }),
+      el("p", { text: "Every living player can send the police a message. The police must catch the killer before time runs out, or the killers win." }),
+      el("div", { class: "timer" + (st.help.endsAt - (Date.now() + clockOffset) < 10000 ? " low" : ""), id: "timer", text: fmtTime(st.help.endsAt - (Date.now() + clockOffset)) })
+    ]);
+  }
+
+  function policeInboxCard() {
+    var msgs = (st.help.messages || []).slice().reverse();
+    return el("div", { class: "card" }, [
+      el("div", { class: "row" }, [
+        el("h3", { text: "Messages from players" }),
+        el("span", { class: "dim small", text: msgs.length + (msgs.length === 1 ? " message" : " messages") })
+      ]),
+      msgs.length
+        ? el("ul", { class: "log inbox" }, msgs.map(function (m) {
+            return el("li", null, [el("b", { text: nameOf(m.fromId) + ": " }), m.text]);
+          }))
+        : el("p", { class: "dim", text: "No messages yet. Players can write to you until time runs out." })
+    ]);
+  }
+
+  setInterval(function () {
+    var t = document.getElementById("timer");
+    if (t && st && st.help) {
+      var left = st.help.endsAt - (Date.now() + clockOffset);
+      t.textContent = fmtTime(left);
+      t.classList.toggle("low", left < 10000);
+    }
+  }, 250);
+
+  function updateAdvice() {
+    var f = $("adviceForm");
+    var show = !!(st.phase === "playing" && st.help && st.me && st.me.alive && st.me.role !== "police" && revealed);
+    f.hidden = !show;
+    if (!show) return;
+    var left = st.help.left;
+    $("adviceHint").textContent = left > 0
+      ? "Tell the police what you think. Only the police can read it. " + left + (left === 1 ? " message left." : " messages left.")
+      : "You used all your messages.";
+    $("adviceInput").disabled = left === 0;
+    $("adviceBtn").disabled = left === 0;
+    var ul = $("adviceSent");
+    ul.textContent = "";
+    st.help.mine.forEach(function (t) { ul.append(el("li", null, ["You: " + t])); });
+  }
+
+  function renderGame(top, bottom) {
     banners.forEach(function (b, i) {
-      box.append(el("div", { class: "banner", role: "alert" }, [
+      top.append(el("div", { class: "banner" + (fx.banner && i === banners.length - 1 ? " fresh" : ""), role: "alert" }, [
+        art("ghost", 38),
         el("span", { text: b }),
         el("button", { type: "button", text: "OK", onclick: function () { banners.splice(i, 1); render(); } })
       ]));
     });
+    if (st.help) top.append(helpPanel());
 
     var me = st.me;
     if (!me) {
-      box.append(el("div", { class: "card" }, [
+      top.append(el("div", { class: "card" }, [
         el("h2", { text: "Round in progress" }),
         el("p", { class: "dim", text: "You are not in this round. Wait for the host to start the next one." })
       ]));
     } else if (!revealed) {
-      box.append(el("button", { class: "cover", type: "button", text: "Tap to reveal your role. Make sure nobody is looking.", onclick: function () { revealed = true; render(); } }));
+      top.append(el("button", { class: "cover", type: "button", onclick: function () { fx.role = true; revealed = true; render(); } }, [el("span", { class: "qmark", text: "?" }), el("span", { text: "Tap to reveal your role. Make sure nobody is looking." })]));
     } else {
       var role = me.role || "citizen";
-      box.append(el("div", { class: "roleCard role-" + role }, [
-        el("h3", { text: "You are the" }),
-        el("h2", { text: role }),
-        el("p", { text: ROLE_TEXT[role] }),
-        el("button", { class: "link", type: "button", text: "Hide my role", onclick: function () { revealed = false; render(); } })
+      top.append(el("div", { class: "roleCard role-" + role + (fx.role ? " flip" : "") }, [
+        el("div", { class: "roleText" }, [
+          el("h3", { text: "You are the" }),
+          el("h2", { text: role }),
+          el("p", { text: ROLE_TEXT[role] }),
+          el("button", { class: "link", type: "button", text: "Hide my role", onclick: function () { revealed = false; render(); } })
+        ]),
+        art(role, 104, "bob")
       ]));
       if (role === "citizen") {
         if (!me.alive) {
-          box.append(el("div", { class: "card" }, [el("p", { text: "You are out. Everyone has been told." })]));
+          top.append(el("div", { class: "card outCard" }, [art("ghost", 64, "bob"), el("p", { text: "You are out. Everyone has been told." })]));
         } else if (confirmStep === "dead") {
-          box.append(confirmCard("Everyone will be told that you died. Sure?", "Yes, I am dead", function () { confirmStep = null; act("dead"); }, "danger"));
+          top.append(confirmCard("Everyone will be told that you died. Sure?", "Yes, I am dead", function () { confirmStep = null; act("dead"); }, "danger"));
         } else {
-          box.append(el("button", { class: "danger bigDead", type: "button", text: "I am dead", onclick: function () { confirmStep = "dead"; render(); } }));
+          top.append(el("button", { class: "danger bigDead", type: "button", text: "I am dead", onclick: function () { confirmStep = "dead"; render(); } }));
         }
       } else if (role === "police") {
+        if (!st.help) {
+          if (confirmStep === "help") {
+            top.append(confirmCard("Every living player will be able to send you advice, and a " + fmtTime(st.helpSeconds * 1000) + " timer starts. If you do not catch the killer in time, the killers win. Sure?", "Yes, ask for help", function () { confirmStep = null; act("help"); }, "primary"));
+          } else {
+            top.append(el("button", { class: "helpBtn", type: "button", text: "Help! Ask everyone for advice", onclick: function () { confirmStep = "help"; render(); } }));
+          }
+        } else {
+          top.append(policeInboxCard());
+        }
         var asked = confirmStep && confirmStep.accuse;
         if (asked) {
-          box.append(confirmCard("Accuse " + nameOf(asked) + "? You only get one guess.", "Accuse", function () { confirmStep = null; act("accuse", { targetId: asked }); }, "danger"));
+          top.append(confirmCard("Accuse " + nameOf(asked) + "? You only get one guess.", "Accuse", function () { confirmStep = null; act("accuse", { targetId: asked }); }, "danger"));
         } else {
           var others = st.players.filter(function (x) { return !x.isMe; });
-          box.append(el("div", { class: "card" }, [
+          top.append(el("div", { class: "card" }, [
             el("h3", { text: "Who is the killer?" }),
             el("div", { class: "picks" }, others.map(function (x) {
-              return el("button", { type: "button", text: x.name + (x.alive ? "" : " (dead)"), onclick: function () { confirmStep = { accuse: x.id }; render(); } });
+              return el("button", { type: "button", onclick: function () { confirmStep = { accuse: x.id }; render(); } }, [avatar(x.name, !x.alive, 26), x.name + (x.alive ? "" : " (dead)")]);
             }))
           ]));
         }
@@ -359,7 +874,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     }
 
     var dead = st.players.filter(function (x) { return !x.alive; }).sort(function (a, b) { return (a.diedAt || 0) - (b.diedAt || 0); });
-    box.append(el("div", { class: "card" }, [
+    bottom.append(el("div", { class: "card" }, [
       el("h3", { text: "Deaths" }),
       dead.length
         ? el("ul", { class: "log" }, dead.map(function (x) {
@@ -369,18 +884,26 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
         : el("p", { class: "dim", text: "Nobody has died yet." })
     ]));
 
-    box.append(el("div", { class: "card" }, [
+    bottom.append(el("div", { class: "card" }, [
       el("h3", { text: "Players" }),
       el("div", { class: "chips" }, st.players.map(function (x) {
-        return el("span", { class: "chip" + (x.alive ? "" : " dead") + (x.isMe ? " me" : "") }, [x.name]);
+        return el("span", { class: "chip" + (x.alive ? "" : " dead") + (x.isMe ? " me" : "") }, [avatar(x.name, !x.alive, 24), x.name]);
       }))
     ]));
 
+    if (me && revealed && me.role === "police") {
+      bottom.append(el("button", { class: "link", type: "button", text: tauntsOff ? "Turn killer taunts on" : "Turn killer taunts off", onclick: function () {
+        tauntsOff = !tauntsOff;
+        try { localStorage.setItem("who-did-it-taunts", tauntsOff ? "off" : "on"); } catch (e) {}
+        render();
+      } }));
+    }
+
     if (st.isHost) {
       if (confirmStep === "end") {
-        box.append(confirmCard("Cancel this round and return everyone to the lobby?", "Return to lobby", function () { confirmStep = null; act("lobby", { mode: "again" }); }, "danger"));
+        bottom.append(confirmCard("Cancel this round and return everyone to the lobby?", "Return to lobby", function () { confirmStep = null; act("lobby", { mode: "again" }); }, "danger"));
       } else {
-        box.append(el("button", { class: "link", type: "button", text: "Host: end round and return to lobby", onclick: function () { confirmStep = "end"; render(); } }));
+        bottom.append(el("button", { class: "link", type: "button", text: "Host: end round and return to lobby", onclick: function () { confirmStep = "end"; render(); } }));
       }
     }
   }
@@ -388,11 +911,14 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   function renderEnded(box) {
     var town = st.winner === "town";
     var accused = st.players.filter(function (x) { return x.id === st.accusedId; })[0];
-    box.append(el("div", { class: "result " + (town ? "town" : "killers") }, [
+    box.append(el("div", { class: "result " + (town ? "town" : "killers") + (fx.result ? " pop" : "") }, [
+      art(st.endReason === "no-citizens" || !town ? "killer" : "police", 112, "bob"),
       el("h3", { text: "Round over" }),
       el("h2", { text: town ? "Police and citizens win" : "Killers win" }),
       el("p", { text: st.endReason === "no-citizens"
         ? "Every citizen is dead. Only police and killers are left, so the killers win."
+        : st.endReason === "time-up"
+        ? "Time ran out before the police caught the killer, so the killers win."
         : nameOf(st.accuserId) + " accused " + nameOf(st.accusedId) + ", who was a " + ((accused && accused.role) || "citizen") + "." })
     ]));
     box.append(el("div", { class: "card" }, [
@@ -421,11 +947,25 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     $("joinForm").hidden = !(lobby && !st.me);
     $("joinBtn").disabled = full;
     $("joinBtn").textContent = full ? "Lobby is full" : "Join game";
-    var box = $("view");
-    box.textContent = "";
-    if (st.phase === "lobby") renderLobby(box);
-    else if (st.phase === "playing") renderGame(box);
-    else renderEnded(box);
+    var top = $("viewTop"), bottom = $("viewBottom");
+    top.textContent = "";
+    bottom.textContent = "";
+    top.className = "stack" + (fx.screen ? " enter" : "");
+    bottom.className = "stack" + (fx.screen ? " enter" : "");
+    if (st.phase === "lobby") renderLobby(top);
+    else if (st.phase === "playing") renderGame(top, bottom);
+    else renderEnded(top);
+    updateAdvice();
+    var sceneDelay = 0;
+    if (fx.kill) { killScene(fx.kill); sceneDelay = reduceMotion ? 0 : 3300; }
+    else if (fx.verdict) { verdictScene(fx.verdict.kind, fx.verdict.name); sceneDelay = reduceMotion ? 0 : 3900; }
+    if (fx.result && st.phase === "ended") {
+      var townWin = st.winner === "town";
+      if (sceneDelay) setTimeout(function () { celebrate(townWin); }, sceneDelay);
+      else celebrate(townWin);
+    }
+    fx.screen = false; fx.role = false; fx.banner = false; fx.help = false; fx.result = false; fx.kill = null; fx.verdict = null;
+    syncTaunts();
   }
 
   function setStatus(t) { $("status").textContent = t; }
@@ -440,6 +980,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
   async function initRoom() {
     $("room").hidden = false;
+    $("howLink").hidden = false;
     setStatus("Connecting...");
     try {
       var s = await api("GET", "/api/room/" + code + "/state?token=" + encodeURIComponent(token));
@@ -463,8 +1004,21 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     act("join", { name: name });
   });
 
+  $("adviceForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var input = $("adviceInput");
+    var text = input.value.trim();
+    if (!text) { setErr("Type a message first."); return; }
+    act("advise", { text: text }).then(function (ok) { if (ok) input.value = ""; });
+  });
+
   function initHome() {
     $("home").hidden = false;
+    $("howBtn").addEventListener("click", function () { openHow($("howBtn")); });
+    $("trio").hidden = true;
+    [["killer", "Killer", "Winks to eliminate"], ["police", "Police", "Finds the killer"], ["citizen", "Citizen", "Stays alive"]].forEach(function (r) {
+      $("hero").append(el("div", { class: "heroItem" }, [art(r[0], 92, "bob"), el("b", { text: r[1] }), el("span", { text: r[2] })]));
+    });
     $("createBtn").addEventListener("click", async function () {
       setErr("");
       try {
@@ -480,7 +1034,13 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     });
   }
 
+  ["killer", "police", "citizen"].forEach(function (n) { $("trio").append(art(n, 36)); });
   try { $("nameInput").value = localStorage.getItem("who-did-it-name") || ""; } catch (x) {}
+  buildHowTo();
+  $("howLink").addEventListener("click", function () { openHow($("howLink")); });
+  $("howClose").addEventListener("click", closeHow);
+  $("howto").addEventListener("click", function (e) { if (e.target === $("howto")) closeHow(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("howto").hidden) closeHow(); });
   if (code) initRoom(); else initHome();
 })();
 </script>
