@@ -79,6 +79,9 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .addRow input { flex: 1; }
 .log.inbox li { display: block; overflow-wrap: anywhere; }
 .helpBtn { padding: 16px; font-size: 1.05rem; width: 100%; border-color: var(--police); color: var(--police); background: transparent; }
+.gameBar { display: flex; justify-content: space-between; align-items: center; border: 2px solid var(--line, #3a4250); background: var(--panel); padding: 8px 14px; font-weight: 600; }
+.gameBar b { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.gameBar.low { border-color: var(--killer, #e5483f); color: var(--killer, #e5483f); }
 .helpPanel { border: 2px solid var(--police); background: var(--panel); padding: 16px; display: flex; flex-direction: column; gap: 8px; }
 .timer { font-family: var(--display); font-size: 3.2rem; line-height: 1; color: var(--police); font-variant-numeric: tabular-nums; }
 .picks { display: flex; flex-direction: column; gap: 8px; }
@@ -744,13 +747,15 @@ button:active:not(:disabled) { transform: scale(0.97); }
       var reason = "";
       if (n < 3) reason = "Need at least 3 players to start.";
       else if (k + p >= n) reason = "Too many killers and police for " + n + " players.";
-      function cfg(patch) { act("config", Object.assign({ target: st.target, killers: k, police: p, helpSeconds: st.helpSeconds }, patch)); }
+      function cfg(patch) { act("config", Object.assign({ target: st.target, killers: k, police: p, helpSeconds: st.helpSeconds, gameSeconds: st.gameSeconds }, patch)); }
       box.append(el("div", { class: "card" }, [
         el("h3", { text: "Host settings" }),
         stepper("Players wanted", st.target, Math.max(3, n, k + p + 1), 20, function (v) { cfg({ target: v }); }),
         stepper("Killers", k, 1, Math.max(1, st.target - p - 1), function (v) { cfg({ killers: v }); }),
         stepper("Police", p, 1, Math.max(1, st.target - k - 1), function (v) { cfg({ police: v }); }),
         stepper("Police time after a help call", st.helpSeconds, 30, 300, function (v) { cfg({ helpSeconds: v }); }, 30, function (v) { return fmtTime(v * 1000); }),
+        stepper("Whole game time", st.gameSeconds || 0, 0, 3600, function (v) { cfg({ gameSeconds: v }); }, 60, function (v) { return v ? fmtTime(v * 1000) : "No limit"; }),
+        el("p", { class: "dim small", text: "If the whole game time runs out before the police catch the killer, the killers win." }),
         el("p", { class: "dim small", text: "Everyone else is a citizen: " + citizens + " with the current lobby." }),
         reason ? el("p", { class: "small", text: reason }) : null,
         el("button", { class: "primary", type: "button", disabled: !!reason, text: "Start game", onclick: function () { act("start"); } })
@@ -787,6 +792,12 @@ button:active:not(:disabled) { transform: scale(0.97); }
   }
 
   setInterval(function () {
+    var g = document.getElementById("gameTimer");
+    if (g && st && st.gameEndsAt) {
+      var gl = st.gameEndsAt - (Date.now() + clockOffset);
+      g.textContent = fmtTime(gl);
+      g.parentNode.classList.toggle("low", gl < 30000);
+    }
     var t = document.getElementById("timer");
     if (t && st && st.help) {
       var left = st.help.endsAt - (Date.now() + clockOffset);
@@ -819,6 +830,7 @@ button:active:not(:disabled) { transform: scale(0.97); }
         el("button", { type: "button", text: "OK", onclick: function () { banners.splice(i, 1); render(); } })
       ]));
     });
+    if (st.gameEndsAt) top.append(el("div", { class: "gameBar" + (st.gameEndsAt - (Date.now() + clockOffset) < 30000 ? " low" : "") }, [el("span", { text: "Game time left" }), el("b", { id: "gameTimer", text: fmtTime(st.gameEndsAt - (Date.now() + clockOffset)) })]));
     if (st.help) top.append(helpPanel());
 
     var me = st.me;
@@ -917,6 +929,8 @@ button:active:not(:disabled) { transform: scale(0.97); }
       el("h2", { text: town ? "Police and citizens win" : "Killers win" }),
       el("p", { text: st.endReason === "no-citizens"
         ? "Every citizen is dead. Only police and killers are left, so the killers win."
+        : st.endReason === "game-time"
+        ? "The game time ran out before the police caught the killer, so the killers win."
         : st.endReason === "time-up"
         ? "Time ran out before the police caught the killer, so the killers win."
         : nameOf(st.accuserId) + " accused " + nameOf(st.accusedId) + ", who was a " + ((accused && accused.role) || "citizen") + "." })

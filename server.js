@@ -72,6 +72,9 @@ function shuffle(a) {
 function clearHelp(room) {
   if (room.helpTimer) clearTimeout(room.helpTimer);
   room.helpTimer = null;
+  if (room.gameTimer) clearTimeout(room.gameTimer);
+  room.gameTimer = null;
+  room.gameEndsAt = null;
 }
 function endRound(room, winner, reason, accusedId, accuserId) {
   clearHelp(room);
@@ -80,6 +83,13 @@ function endRound(room, winner, reason, accusedId, accuserId) {
   room.endReason = reason;
   room.accusedId = accusedId || null;
   room.accuserId = accuserId || null;
+}
+function gameTimeUp(room) {
+  room.gameTimer = null;
+  if (room.phase === "playing") {
+    endRound(room, "killers", "game-time", null, null);
+    broadcast(room);
+  }
 }
 function helpExpired(room) {
   return room.phase === "playing" && room.help && Date.now() >= room.help.endsAt;
@@ -114,6 +124,8 @@ function view(room, token) {
     accuserId: room.accuserId,
     endReason: room.endReason,
     helpSeconds: room.helpSeconds,
+    gameSeconds: room.gameSeconds,
+    gameEndsAt: room.phase === "playing" ? room.gameEndsAt : null,
     serverNow: Date.now(),
     help: room.help ? helpView(room, mine) : null
   };
@@ -191,7 +203,9 @@ function applyAction(room, action, token, body) {
       if (killers + police > target - 1) fail("Killers plus police must leave room for at least one citizen.");
       let helpSeconds = room.helpSeconds;
       if (body.helpSeconds !== undefined) helpSeconds = clampInt(body.helpSeconds, 30, 300);
-      room.target = target; room.killers = killers; room.police = police; room.helpSeconds = helpSeconds;
+      let gameSeconds = room.gameSeconds;
+      if (body.gameSeconds !== undefined) gameSeconds = body.gameSeconds === 0 ? 0 : clampInt(body.gameSeconds, 60, 3600);
+      room.target = target; room.killers = killers; room.police = police; room.helpSeconds = helpSeconds; room.gameSeconds = gameSeconds;
       break;
     }
     case "start": {
@@ -209,6 +223,10 @@ function applyAction(room, action, token, body) {
       room.help = null;
       room.round += 1;
       room.phase = "playing";
+      if (room.gameSeconds > 0) {
+        room.gameEndsAt = Date.now() + room.gameSeconds * 1000;
+        room.gameTimer = setTimeout(() => gameTimeUp(room), room.gameSeconds * 1000 + 100);
+      }
       room.winner = null; room.accusedId = null; room.accuserId = null; room.endReason = null;
       break;
     }
@@ -316,7 +334,7 @@ const server = http.createServer(async (req, res) => {
         code: newCode(), hostToken: body.token, phase: "lobby", round: 0,
         target: 6, killers: 1, police: 1, players: [], clients: new Set(),
         winner: null, accusedId: null, accuserId: null, endReason: null,
-        helpSeconds: 120, help: null, helpTimer: null, touched: Date.now()
+        helpSeconds: 120, gameSeconds: 0, gameEndsAt: null, gameTimer: null, help: null, helpTimer: null, touched: Date.now()
       };
       rooms.set(room.code, room);
       return sendJson(res, 200, { code: room.code });
