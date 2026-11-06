@@ -1,0 +1,9 @@
+{
+  "name": "who-did-it",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Killer, police and citizens party game for phones",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}

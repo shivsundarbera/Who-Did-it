@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Who Did It</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #12151a;
+  --panel: #1b2027;
+  --panel-2: #242b35;
+  --line: #333c49;
+  --ink: #ece6d6;
+  --dim: #8d96a5;
+  --killer: #e5483f;
+  --police: #5b8def;
+  --citizen: #e9b44c;
+  --ok: #6cc08b;
+  --display: "Special Elite", "Courier New", ui-monospace, monospace;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.45;
+  padding: 22px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px));
+  display: flex;
+  justify-content: center;
+}
+main { width: 100%; max-width: 480px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; }
+h1 { font-size: 2rem; letter-spacing: 0.01em; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--dim); font-family: var(--body); font-weight: 600; }
+p { margin: 0; }
+.dim { color: var(--dim); }
+.small { font-size: 0.85rem; }
+header { display: flex; flex-direction: column; gap: 4px; padding-bottom: 14px; border-bottom: 1px dashed var(--line); }
+#status { font-size: 0.8rem; color: var(--dim); min-height: 1.2em; }
+.stack { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.row { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+input[type=text] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); padding: 11px 12px; width: 100%; min-width: 0; }
+input[type=text]:focus-visible, button:focus-visible { outline: 2px solid var(--citizen); outline-offset: 2px; }
+button { font: inherit; font-weight: 600; cursor: pointer; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); padding: 11px 16px; }
+button:hover:not(:disabled) { border-color: var(--dim); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.primary { background: var(--citizen); color: #1a1405; border-color: var(--citizen); }
+.primary:hover:not(:disabled) { background: #f3c566; border-color: #f3c566; }
+.danger { background: var(--killer); border-color: var(--killer); color: #fff; }
+.danger:hover:not(:disabled) { background: #f05a51; border-color: #f05a51; }
+.link { background: none; border: 0; padding: 4px 0; color: var(--dim); font-weight: 500; text-decoration: underline; text-align: left; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; background: var(--panel-2); border: 1px solid var(--line); padding: 6px 10px; max-width: 100%; overflow-wrap: anywhere; }
+.chip.me { border-color: var(--citizen); }
+.chip.dead { text-decoration: line-through; color: var(--dim); }
+.chip button { padding: 0 4px; border: 0; background: none; color: var(--dim); font-size: 1rem; line-height: 1; }
+.stepper { display: flex; align-items: center; gap: 10px; }
+.stepper b { min-width: 2ch; text-align: center; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.stepper button { padding: 6px 12px; }
+.code { font-family: var(--display); font-size: 2.4rem; letter-spacing: 0.18em; color: var(--citizen); }
+.linkBox { display: flex; gap: 8px; }
+.linkBox input { flex: 1; }
+.cover { text-align: center; padding: 34px 16px; border: 2px dashed var(--line); background: var(--panel); width: 100%; font-family: var(--display); font-size: 1.15rem; color: var(--ink); }
+.roleCard { border: 2px solid var(--c); padding: 20px 16px; background: var(--panel); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.roleCard h2 { color: var(--c); font-size: 2.2rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.role-killer { --c: var(--killer); }
+.role-police { --c: var(--police); }
+.role-citizen { --c: var(--citizen); }
+.bigDead { padding: 22px 16px; font-size: 1.25rem; width: 100%; }
+.picks { display: flex; flex-direction: column; gap: 8px; }
+.picks button { text-align: left; font-size: 1rem; overflow-wrap: anywhere; }
+.banner { background: var(--killer); color: #fff; padding: 16px; display: flex; justify-content: space-between; gap: 12px; align-items: center; font-weight: 600; font-size: 1.1rem; }
+.banner button { background: rgba(0,0,0,0.25); border-color: transparent; color: #fff; padding: 6px 12px; }
+.log { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.log li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px dotted var(--line); padding-bottom: 6px; }
+.result { padding: 20px 16px; border: 2px solid var(--c); background: var(--panel); display: flex; flex-direction: column; gap: 8px; }
+.result h2 { font-size: 1.9rem; color: var(--c); }
+.result.town { --c: var(--ok); }
+.result.killers { --c: var(--killer); }
+.reveal { display: flex; flex-direction: column; gap: 6px; }
+.reveal div { display: flex; justify-content: space-between; gap: 10px; padding: 8px 10px; background: var(--panel-2); border-left: 4px solid var(--c); }
+.reveal b { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; color: var(--c); }
+#err { color: #ffb4ad; font-size: 0.85rem; min-height: 1em; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Who Did It</h1>
+    <p class="dim small">Killer, police and citizens. Everyone plays on their own phone.</p>
+    <div id="status"></div>
+  </header>
+
+  <div id="home" class="stack" hidden>
+    <div class="card">
+      <h2>Host a game</h2>
+      <p class="dim">Create a lobby, then send the link to your friends.</p>
+      <button class="primary" type="button" id="createBtn">Create lobby</button>
+    </div>
+    <form class="card" id="codeForm">
+      <h3>Have a code?</h3>
+      <input type="text" id="codeInput" maxlength="10" placeholder="Lobby code" autocomplete="off" autocapitalize="characters" aria-label="Lobby code">
+      <button type="submit">Join lobby</button>
+    </form>
+  </div>
+
+  <div id="notfound" class="card" hidden>
+    <h2>Lobby not found</h2>
+    <p class="dim">The link may be wrong, or the host's server restarted. Ask the host for a new link.</p>
+    <a href="/" style="color: var(--citizen)">Back to start</a>
+  </div>
+
+  <div id="room" class="stack" hidden>
+    <div id="shareBox" class="card" hidden></div>
+    <form id="joinForm" class="card" hidden>
+      <h3>Join the lobby</h3>
+      <input type="text" id="nameInput" maxlength="20" placeholder="Your name" autocomplete="off" aria-label="Your name">
+      <button class="primary" type="submit" id="joinBtn">Join game</button>
+    </form>
+    <div id="view" class="stack"></div>
+  </div>
+
+  <div id="err" role="status"></div>
+</main>
+
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+  function el(tag, props, kids) {
+    var n = document.createElement(tag);
+    if (props) Object.keys(props).forEach(function (k) {
+      var v = props[k];
+      if (k === "class") n.className = v;
+      else if (k === "text") n.textContent = v;
+      else if (k.indexOf("on") === 0) n.addEventListener(k.slice(2), v);
+      else if (v === true) n.setAttribute(k, "");
+      else if (v !== false && v != null) n.setAttribute(k, v);
+    });
+    (kids || []).forEach(function (c) {
+      if (c == null) return;
+      n.append(c.nodeType ? c : document.createTextNode(String(c)));
+    });
+    return n;
+  }
+
+  function makeToken() {
+    var a = new Uint8Array(16);
+    (window.crypto || window.msCrypto).getRandomValues(a);
+    return Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+  }
+  function getToken() {
+    try {
+      var t = localStorage.getItem("who-did-it-token");
+      if (t && /^[A-Za-z0-9]{16,64}$/.test(t)) return t;
+      t = makeToken();
+      localStorage.setItem("who-did-it-token", t);
+      return t;
+    } catch (e) { return makeToken(); }
+  }
+
+  var token = getToken();
+  var match = location.pathname.match(/^\/r\/([A-Za-z0-9]{3,10})\/?$/);
+  var code = match ? match[1].toUpperCase() : null;
+  var st = null, revealed = false, confirmStep = null, banners = [], knownDead = null, busy = false;
+
+  var ROLE_TEXT = {
+    killer: "Take out citizens without being spotted. You have no buttons. Stay quiet.",
+    police: "Find the killer. You get exactly one guess, so choose carefully.",
+    citizen: "Stay alive. If a killer gets you, tap the button to tell everyone."
+  };
+
+  function setErr(t) { $("err").textContent = t || ""; }
+
+  async function api(method, path, body) {
+    var opts = { method: method, headers: { "Content-Type": "application/json" } };
+    if (body) opts.body = JSON.stringify(body);
+    var res = await fetch(path, opts);
+    var data = {};
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok) { var err = new Error(data.error || "Something went wrong."); err.status = res.status; throw err; }
+    return data;
+  }
+
+  async function act(action, extra) {
+    if (busy) return;
+    busy = true; setErr("");
+    try {
+      var body = Object.assign({ token: token }, extra || {});
+      var data = await api("POST", "/api/room/" + code + "/" + action, body);
+      if (data.state) onState(data.state);
+    } catch (e) { setErr(e.message); }
+    busy = false;
+  }
+
+  function onState(s) {
+    var prev = st;
+    if (!prev || prev.phase !== s.phase || prev.round !== s.round) {
+      if (s.phase === "playing") { revealed = false; confirmStep = null; banners = []; knownDead = null; }
+      if (s.phase !== "playing") { banners = []; confirmStep = null; }
+    }
+    if (s.phase === "playing") {
+      var dead = s.players.filter(function (p) { return !p.alive; });
+      if (knownDead) {
+        dead.forEach(function (p) { if (!knownDead[p.id]) banners.push(p.name + " died"); });
+      }
+      knownDead = {};
+      dead.forEach(function (p) { knownDead[p.id] = true; });
+    }
+    st = s;
+    render();
+  }
+
+  function stepper(label, value, min, max, onChange) {
+    return el("div", { class: "row" }, [
+      el("span", { text: label }),
+      el("div", { class: "stepper" }, [
+        el("button", { type: "button", "aria-label": "Fewer " + label, disabled: value <= min, text: "-", onclick: function () { onChange(value - 1); } }),
+        el("b", { text: String(value) }),
+        el("button", { type: "button", "aria-label": "More " + label, disabled: value >= max, text: "+", onclick: function () { onChange(value + 1); } })
+      ])
+    ]);
+  }
+
+  function confirmCard(text, yesLabel, yesFn, yesClass) {
+    return el("div", { class: "card" }, [
+      el("p", { text: text }),
+      el("div", { class: "row" }, [
+        el("button", { class: yesClass || "primary", type: "button", text: yesLabel, onclick: yesFn }),
+        el("button", { type: "button", text: "Cancel", onclick: function () { confirmStep = null; render(); } })
+      ])
+    ]);
+  }
+
+  function nameOf(id) {
+    var p = st.players.filter(function (x) { return x.id === id; })[0];
+    return p ? p.name : "Someone";
+  }
+
+  function renderShare() {
+    var box = $("shareBox");
+    box.textContent = "";
+    var link = location.origin + "/r/" + st.code;
+    var input = el("input", { type: "text", readonly: true, value: link, "aria-label": "Lobby link" });
+    input.value = link;
+    var copyBtn = el("button", { type: "button", text: "Copy", onclick: function () {
+      function fallback() { input.focus(); input.select(); copyBtn.textContent = "Press Ctrl+C"; }
+      try {
+        navigator.clipboard.writeText(link).then(function () { copyBtn.textContent = "Copied"; }, fallback);
+      } catch (e) { fallback(); }
+    } });
+    var kids = [
+      el("h3", { text: "Lobby code" }),
+      el("div", { class: "code", text: st.code }),
+      el("p", { class: "dim small", text: "Send this link to your friends so they can join:" }),
+      el("div", { class: "linkBox" }, [input, copyBtn])
+    ];
+    if (navigator.share) {
+      kids.push(el("button", { type: "button", text: "Share link", onclick: function () {
+        navigator.share({ title: "Who Did It", text: "Join my lobby", url: link }).catch(function () {});
+      } }));
+    }
+    kids.forEach(function (k) { box.append(k); });
+  }
+
+  function renderLobby(box) {
+    var n = st.players.length, k = st.killers, p = st.police;
+    var citizens = Math.max(0, n - k - p);
+    var chips = el("div", { class: "chips" }, st.players.map(function (pl) {
+      var kids = [pl.name];
+      if (st.isHost && !pl.isMe) {
+        kids.push(el("button", { type: "button", "aria-label": "Remove " + pl.name, text: "x", onclick: function () { act("kick", { playerId: pl.id }); } }));
+      }
+      return el("span", { class: "chip" + (pl.isMe ? " me" : "") }, kids);
+    }));
+    var lobby = el("div", { class: "card" }, [
+      el("div", { class: "row" }, [el("h2", { text: "Lobby" }), el("span", { class: "dim", text: n + " of " + st.target + " joined" })]),
+      n ? chips : el("p", { class: "dim", text: "Nobody has joined yet." })
+    ]);
+    if (st.me) lobby.append(el("button", { class: "link", type: "button", text: "Leave lobby", onclick: function () { act("leave"); } }));
+    box.append(lobby);
+
+    if (st.isHost) {
+      var reason = "";
+      if (n < 3) reason = "Need at least 3 players to start.";
+      else if (k + p >= n) reason = "Too many killers and police for " + n + " players.";
+      function cfg(patch) { act("config", Object.assign({ target: st.target, killers: k, police: p }, patch)); }
+      box.append(el("div", { class: "card" }, [
+        el("h3", { text: "Host settings" }),
+        stepper("Players wanted", st.target, Math.max(3, n, k + p + 1), 20, function (v) { cfg({ target: v }); }),
+        stepper("Killers", k, 1, Math.max(1, st.target - p - 1), function (v) { cfg({ killers: v }); }),
+        stepper("Police", p, 1, Math.max(1, st.target - k - 1), function (v) { cfg({ police: v }); }),
+        el("p", { class: "dim small", text: "Everyone else is a citizen: " + citizens + " with the current lobby." }),
+        reason ? el("p", { class: "small", text: reason }) : null,
+        el("button", { class: "primary", type: "button", disabled: !!reason, text: "Start game", onclick: function () { act("start"); } })
+      ]));
+    } else {
+      box.append(el("div", { class: "card" }, [
+        el("h3", { text: "Waiting for the host" }),
+        el("p", { class: "dim", text: k + (k === 1 ? " killer" : " killers") + ", " + p + " police, everyone else is a citizen." })
+      ]));
+    }
+  }
+
+  function renderGame(box) {
+    banners.forEach(function (b, i) {
+      box.append(el("div", { class: "banner", role: "alert" }, [
+        el("span", { text: b }),
+        el("button", { type: "button", text: "OK", onclick: function () { banners.splice(i, 1); render(); } })
+      ]));
+    });
+
+    var me = st.me;
+    if (!me) {
+      box.append(el("div", { class: "card" }, [
+        el("h2", { text: "Round in progress" }),
+        el("p", { class: "dim", text: "You are not in this round. Wait for the host to start the next one." })
+      ]));
+    } else if (!revealed) {
+      box.append(el("button", { class: "cover", type: "button", text: "Tap to reveal your role. Make sure nobody is looking.", onclick: function () { revealed = true; render(); } }));
+    } else {
+      var role = me.role || "citizen";
+      box.append(el("div", { class: "roleCard role-" + role }, [
+        el("h3", { text: "You are the" }),
+        el("h2", { text: role }),
+        el("p", { text: ROLE_TEXT[role] }),
+        el("button", { class: "link", type: "button", text: "Hide my role", onclick: function () { revealed = false; render(); } })
+      ]));
+      if (role === "citizen") {
+        if (!me.alive) {
+          box.append(el("div", { class: "card" }, [el("p", { text: "You are out. Everyone has been told." })]));
+        } else if (confirmStep === "dead") {
+          box.append(confirmCard("Everyone will be told that you died. Sure?", "Yes, I am dead", function () { confirmStep = null; act("dead"); }, "danger"));
+        } else {
+          box.append(el("button", { class: "danger bigDead", type: "button", text: "I am dead", onclick: function () { confirmStep = "dead"; render(); } }));
+        }
+      } else if (role === "police") {
+        var asked = confirmStep && confirmStep.accuse;
+        if (asked) {
+          box.append(confirmCard("Accuse " + nameOf(asked) + "? You only get one guess.", "Accuse", function () { confirmStep = null; act("accuse", { targetId: asked }); }, "danger"));
+        } else {
+          var others = st.players.filter(function (x) { return !x.isMe; });
+          box.append(el("div", { class: "card" }, [
+            el("h3", { text: "Who is the killer?" }),
+            el("div", { class: "picks" }, others.map(function (x) {
+              return el("button", { type: "button", text: x.name + (x.alive ? "" : " (dead)"), onclick: function () { confirmStep = { accuse: x.id }; render(); } });
+            }))
+          ]));
+        }
+      }
+    }
+
+    var dead = st.players.filter(function (x) { return !x.alive; }).sort(function (a, b) { return (a.diedAt || 0) - (b.diedAt || 0); });
+    box.append(el("div", { class: "card" }, [
+      el("h3", { text: "Deaths" }),
+      dead.length
+        ? el("ul", { class: "log" }, dead.map(function (x) {
+            var t = x.diedAt ? new Date(x.diedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+            return el("li", null, [el("span", { text: x.name + " died" }), el("span", { class: "dim", text: t })]);
+          }))
+        : el("p", { class: "dim", text: "Nobody has died yet." })
+    ]));
+
+    box.append(el("div", { class: "card" }, [
+      el("h3", { text: "Players" }),
+      el("div", { class: "chips" }, st.players.map(function (x) {
+        return el("span", { class: "chip" + (x.alive ? "" : " dead") + (x.isMe ? " me" : "") }, [x.name]);
+      }))
+    ]));
+
+    if (st.isHost) {
+      if (confirmStep === "end") {
+        box.append(confirmCard("Cancel this round and return everyone to the lobby?", "Return to lobby", function () { confirmStep = null; act("lobby", { mode: "again" }); }, "danger"));
+      } else {
+        box.append(el("button", { class: "link", type: "button", text: "Host: end round and return to lobby", onclick: function () { confirmStep = "end"; render(); } }));
+      }
+    }
+  }
+
+  function renderEnded(box) {
+    var town = st.winner === "town";
+    var accused = st.players.filter(function (x) { return x.id === st.accusedId; })[0];
+    box.append(el("div", { class: "result " + (town ? "town" : "killers") }, [
+      el("h3", { text: "Round over" }),
+      el("h2", { text: town ? "Police and citizens win" : "Killers win" }),
+      el("p", { text: st.endReason === "no-citizens"
+        ? "Every citizen is dead. Only police and killers are left, so the killers win."
+        : nameOf(st.accuserId) + " accused " + nameOf(st.accusedId) + ", who was a " + ((accused && accused.role) || "citizen") + "." })
+    ]));
+    box.append(el("div", { class: "card" }, [
+      el("h3", { text: "Everyone's role" }),
+      el("div", { class: "reveal" }, st.players.map(function (x) {
+        var r = x.role || "citizen";
+        return el("div", { class: "role-" + r }, [el("span", { text: x.name }), el("b", { text: r })]);
+      }))
+    ]));
+    if (st.isHost) {
+      box.append(el("div", { class: "row" }, [
+        el("button", { class: "primary", type: "button", text: "Play again, same players", onclick: function () { act("lobby", { mode: "again" }); } }),
+        el("button", { type: "button", text: "Clear lobby", onclick: function () { act("lobby", { mode: "clear" }); } })
+      ]));
+    } else {
+      box.append(el("p", { class: "dim small", text: "Waiting for the host to start another round." }));
+    }
+  }
+
+  function render() {
+    if (!st) return;
+    var lobby = st.phase === "lobby";
+    $("shareBox").hidden = !lobby;
+    if (lobby) renderShare();
+    var full = lobby && !st.me && st.players.length >= st.target;
+    $("joinForm").hidden = !(lobby && !st.me);
+    $("joinBtn").disabled = full;
+    $("joinBtn").textContent = full ? "Lobby is full" : "Join game";
+    var box = $("view");
+    box.textContent = "";
+    if (st.phase === "lobby") renderLobby(box);
+    else if (st.phase === "playing") renderGame(box);
+    else renderEnded(box);
+  }
+
+  function setStatus(t) { $("status").textContent = t; }
+
+  function startEvents() {
+    var es = new EventSource("/api/room/" + code + "/events?token=" + encodeURIComponent(token));
+    es.addEventListener("state", function (e) {
+      try { onState(JSON.parse(e.data)); setStatus(st.isHost ? "You are the host." : ""); } catch (x) {}
+    });
+    es.onerror = function () { setStatus("Connection lost. Trying to reconnect..."); };
+  }
+
+  async function initRoom() {
+    $("room").hidden = false;
+    setStatus("Connecting...");
+    try {
+      var s = await api("GET", "/api/room/" + code + "/state?token=" + encodeURIComponent(token));
+      onState(s);
+      setStatus(s.isHost ? "You are the host." : "");
+      startEvents();
+      // Tiny request every 4 minutes so a free host does not fall asleep while the page is open.
+      setInterval(function () { fetch("/healthz", { cache: "no-store" }).catch(function () {}); }, 240000);
+    } catch (e) {
+      $("room").hidden = true;
+      if (e.status === 404) { $("notfound").hidden = false; setStatus(""); }
+      else setStatus("Cannot reach the game server. Reload the page.");
+    }
+  }
+
+  $("joinForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var name = $("nameInput").value.trim();
+    if (!name) { setErr("Type a name first."); return; }
+    try { localStorage.setItem("who-did-it-name", name); } catch (x) {}
+    act("join", { name: name });
+  });
+
+  function initHome() {
+    $("home").hidden = false;
+    $("createBtn").addEventListener("click", async function () {
+      setErr("");
+      try {
+        var data = await api("POST", "/api/create", { token: token });
+        location.assign("/r/" + data.code);
+      } catch (e) { setErr(e.message); }
+    });
+    $("codeForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var c = $("codeInput").value.trim().toUpperCase();
+      if (!/^[A-Z0-9]{3,10}$/.test(c)) { setErr("Type the lobby code first."); return; }
+      location.assign("/r/" + c);
+    });
+  }
+
+  try { $("nameInput").value = localStorage.getItem("who-did-it-name") || ""; } catch (x) {}
+  if (code) initRoom(); else initHome();
+})();
+</script>
+</body>
+</html>
